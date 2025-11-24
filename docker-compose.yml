@@ -1,0 +1,87 @@
+name: scheduller-trigger
+
+networks:
+  network:
+    driver: bridge
+
+volumes:
+  redis-data:
+    external: false
+
+services:
+
+  redis:
+    container_name: redis
+    hostname: redis
+    image: redis:7.4-alpine
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    volumes:
+      - redis-data:/data
+    networks:
+      - network
+    command: [ "redis-server", "--notify-keyspace-events", "Ex" ]
+
+  mailhog:
+    container_name: mailhog
+    hostname: mailhog
+    image: "mailhog/mailhog:v1.0.1"
+    ports:
+      - "1025:1025"                         # SMTP
+      - "8025:8025"                         # Interface web
+    environment:
+      SMTP_USER: user@scheduller_trigger.com
+      SMTP_PASSWORD: pwd
+      EMAILS_FROM_EMAIL: noreply@scheduller_trigger.com
+      SMTP_PORT: 465
+      SMTP_HOST: stunnel
+      EMAILS_FROM_NAME: No reply
+      MAIL_TLS: true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8025"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - network
+
+   # Proxy to add TLS encryption on development env, because gomail needs TLS
+  stunnel:
+   image: dweomer/stunnel
+   restart: always
+   environment:
+     - STUNNEL_SERVICE=smtps
+     - STUNNEL_ACCEPT=465
+     - STUNNEL_CONNECT=mailhog:1025
+   networks:
+     - network
+   healthcheck:
+     test: ["CMD", "curl", "--insecure", "--fail", "https://localhost:465"]
+     interval: 30s
+     timeout: 10s
+     retries: 3
+   ports:
+     - 465:465
+
+  api-rest:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    env_file:
+      - ./api/.env
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./api:/usr/src/app
+    networks:
+      - network
+    depends_on:
+
+      - mailhog
+      - stunnel 
+    command: CompileDaemon -build="go build -o /usr/src/app/bin/rest/main /usr/src/app/cmd/rest/main.go" -command="./bin/rest/main"
