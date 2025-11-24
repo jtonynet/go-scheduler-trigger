@@ -1,0 +1,15 @@
+###
+# @name liveness route
+GET http://localhost:8080/liveness 
+Content-Type: application/json
+
+###
+# @name Store a scheduled message to be sent on the UTC date of "trigger_at"
+POST http://localhost:8080/v1/schedules
+Content-Type: application/json
+
+{
+    "email": "test001@gmail.com",
+    "message": "Teste de envio temporizado",
+    "UTC_trigger_at":"2025-11-24T19:41:00Z"
+}

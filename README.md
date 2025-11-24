@@ -54,7 +54,7 @@ __[Go Scheduler Trigger](#header)__<br/>
 <a id="about"></a>
 ### 📖 Sobre
 
-`go-scheduler-trigger` é um estudo para agendador reativo desenvolvido em `Go`, projetado para disparar mensagens e notificações quase em tempo real, sem depender de cron jobs ou polling contínuo.
+`go-scheduler-trigger` é um estudo para agendador reativo desenvolvido em `Go`, projetado para disparar eventos, mensagens ou notificações quase em tempo real, sem depender de `cron jobs` ou `polling` contínuo.
 
 O projeto resolve o problema de sistemas que precisam enviar alertas, emails ou executar tarefas temporizadas com precisão e eficiência, eliminando a complexidade e o overhead de soluções tradicionais baseadas em agendamento recorrente.
 
