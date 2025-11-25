@@ -81,7 +81,25 @@ services:
     networks:
       - network
     depends_on:
-
+      - redis
       - mailhog
       - stunnel 
     command: CompileDaemon -build="go build -o /usr/src/app/bin/rest/main /usr/src/app/cmd/rest/main.go" -command="./bin/rest/main"
+
+
+  api-worker:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    env_file:
+      - ./api/.env
+    volumes:
+      - ./api:/usr/src/app
+    networks:
+      - network
+    depends_on:
+      - redis
+      - mailhog
+      - stunnel 
+    command: CompileDaemon -build="go build -o /usr/src/app/bin/worker/main /usr/src/app/cmd/worker/main.go" -command="./bin/worker/main"
+

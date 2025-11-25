@@ -80,11 +80,23 @@ func (c *Cache) ToInMemoryDB() InMemoryDatabase {
 	}
 }
 
+type MailNotification struct {
+	SMTPHost         string `mapstructure:"MAIL_NOTIFICATION_SMTP_HOST"`
+	SMTPPort         int    `mapstructure:"MAIL_NOTIFICATION_SMTP_PORT"`
+	SMTPUser         string `mapstructure:"MAIL_NOTIFICATION_SMTP_USER"`
+	SMTPPassword     string `mapstructure:"MAIL_NOTIFICATION_SMTP_PASSWORD"`
+	EmailFromEmail   string `mapstructure:"MAIL_NOTIFICATION_EMAILS_FROM_EMAIL"`
+	EmailFromName    string `mapstructure:"MAIL_NOTIFICATION_EMAILS_FROM_NAME"`
+	UseMailTLS       bool   `mapstructure:"MAIL_NOTIFICATION_MAIL_TLS"`
+	IsDevelopmentEnv bool   `mapstructure:"MAIL_NOTIFICATION_IS_DEVELOPMENT_ENV"`
+}
+
 type Config struct {
-	API     API     `mapstructure:",squash"`
-	PubSub  PubSub  `mapstructure:",squash"`
-	Trigger Trigger `mapstructure:",squash"`
-	Cache   Cache   `mapstructure:",squash"`
+	API              API              `mapstructure:",squash"`
+	PubSub           PubSub           `mapstructure:",squash"`
+	Trigger          Trigger          `mapstructure:",squash"`
+	Cache            Cache            `mapstructure:",squash"`
+	MailNotification MailNotification `mapstructure:",squash"`
 }
 
 func LoadConfig(path string) (*Config, error) {
