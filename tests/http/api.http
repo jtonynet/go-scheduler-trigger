@@ -9,7 +9,7 @@ POST http://localhost:8080/v1/schedules
 Content-Type: application/json
 
 {
-    "email": "test001@gmail.com",
-    "message": "Teste de envio temporizado",
-    "UTC_trigger_at":"2025-11-24T19:41:00Z"
+    "email": "test003@gmail.com",
+    "message": "CANCELOU MANEH!",
+    "UTC_trigger_at":"2025-11-25T03:14:00Z"
 }

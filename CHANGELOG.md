@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+## [0.0.2] - 2025-03-12
+### Added
+
+- Work in Progress (WIP) worker sends a mail message to mailhog.
+
 ## [0.0.1] - 2025-24-11
 ### Added
 
@@ -20,5 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First commit to start the project/study.
 
+[0.0.2]: https://github.com/jtonynet/go-scheduler-trigger/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/jtonynet/go-scheduler-trigger/compare/v0.0.0...v0.0.1
 [0.0.0]: https://github.com/jtonynet/go-scheduler-trigger/releases/tag/v0.0.0
