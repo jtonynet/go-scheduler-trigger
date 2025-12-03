@@ -97,7 +97,7 @@ func listenTriggers(ctx context.Context, rdb *redis.Client, cacheInMemoDB databa
 			continue
 		}
 
-		log.Printf("📦 Payload Recuperado: %s", value)
+		log.Printf("Payload Recuperado: %s", value)
 
 		// PROCESSAR EVENTO DE NEGÓCIO AQUI --------------------
 		processExpiration(key, value, mail)
