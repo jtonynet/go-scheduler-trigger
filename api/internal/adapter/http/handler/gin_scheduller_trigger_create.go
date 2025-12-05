@@ -9,14 +9,14 @@ import (
 	"github.com/jtonynet/go-scheduler-trigger/api/internal/core/dto"
 )
 
-// @Summary Payment Execute Transaction
-// @Description Schedule trigger to send email at a pre-determined UTC date/time.
-// @Tags SchedulerTrigger
-// @Accept json
-// @Produce json
-// @Param request body dto.SchedulerTriggerReq true "Request body for Create Scheduler Trigger"
-// @Router /schedules [post]
-// @Success 200 {object} dto.SchedulerTriggerResp
+// @Summary			Create Scheduler Trigger
+// @Description		Schedule trigger to send email at a pre-determined UTC date/time.
+// @Tags			Schedules
+// @Accept			json
+// @Produce			json
+// @Param			request	body	dto.SchedulerTriggerReq	true	"Request body for Create Scheduler Trigger"
+// @Router			/v1/schedules [post]
+// @Success			200	{object}	dto.SchedulerTriggerResp
 func SchedulerTriggerCreate(ctx *gin.Context) {
 	app := ctx.MustGet("app").(bootstrap.REST)
 

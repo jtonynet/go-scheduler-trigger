@@ -1,0 +1,122 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/liveness": {
+            "get": {
+                "description": "Check API Health Liveness with some app data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API"
+                ],
+                "summary": "API Health Liveness",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.LivenessResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/schedules": {
+            "post": {
+                "description": "Schedule trigger to send email at a pre-determined UTC date/time.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Schedules"
+                ],
+                "summary": "Create Scheduler Trigger",
+                "parameters": [
+                    {
+                        "description": "Request body for Create Scheduler Trigger",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SchedulerTriggerReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SchedulerTriggerResp"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.LivenessResp": {
+            "type": "object",
+            "required": [
+                "message",
+                "sumary"
+            ],
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "OK"
+                },
+                "sumary": {
+                    "type": "string",
+                    "example": "go-scheduler-trigger-api:8080 in TagVersion: 0.0.0 on Envoriment:dev responds OK"
+                }
+            }
+        },
+        "dto.SchedulerTriggerReq": {
+            "type": "object",
+            "required": [
+                "UTC_trigger_at",
+                "email",
+                "message"
+            ],
+            "properties": {
+                "UTC_trigger_at": {
+                    "type": "string",
+                    "example": "2025-11-18T15:28:00Z"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "test001@gmail.com"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Teste de envio temporizado"
+                }
+            }
+        },
+        "dto.SchedulerTriggerResp": {
+            "type": "object",
+            "required": [
+                "message"
+            ],
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Request Accepted"
+                },
+                "uuid": {
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                }
+            }
+        }
+    }
+}

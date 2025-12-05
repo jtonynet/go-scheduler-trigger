@@ -9,13 +9,13 @@ import (
 	"github.com/jtonynet/go-scheduler-trigger/api/internal/core/dto"
 )
 
-// @Summary API Health Liveness
-// @Description Check API Health Liveness with some app data
-// @Tags API
-// @Accept json
-// @Produce json
-// @Router /liveness [get]
-// @Success 200 {object} dto.LivenessResp
+// @Summary			API Health Liveness
+// @Description		Check API Health Liveness with some app data
+// @Tags			API
+// @Accept			json
+// @Produce			json
+// @Router			/liveness [get]
+// @Success			200	{object}	dto.LivenessResp
 func Liveness(c *gin.Context) {
 	cfg := c.MustGet("cfg").(config.API)
 
