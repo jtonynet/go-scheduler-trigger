@@ -8,20 +8,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jtonynet/go-scheduler-trigger/api/config"
-	"github.com/jtonynet/go-scheduler-trigger/api/internal/database"
-	"github.com/jtonynet/go-scheduler-trigger/api/internal/email"
+	"github.com/jtonynet/go-scheduler-trigger/api/internal/adapter/database"
+	"github.com/jtonynet/go-scheduler-trigger/api/internal/adapter/email"
+	"github.com/jtonynet/go-scheduler-trigger/api/internal/core/dto"
 
 	"github.com/redis/go-redis/v9"
 )
-
-type ScheduleDTO struct {
-	UID       uuid.UUID `json:"uuid"`
-	Email     string    `json:"email" binding:"required" example:"test001@gmail.com"`
-	Message   string    `json:"message" binding:"required" example:"Teste de envio temporizado"`
-	TriggerAt string    `json:"UTC_trigger_at" binding:"required" example:"2025-11-18T15:28:00Z"`
-}
 
 func main() {
 	cfg2, err := config.LoadConfig(".")
@@ -120,7 +113,7 @@ func processExpiration(key, value string, mail *email.Mail) {
 	log.Printf("Processando expiração da chave [%s] com payload: %s", key, value)
 	// Aqui vai sua lógica de trigger, scheduler, etc.
 
-	var scheduleDTO ScheduleDTO
+	var scheduleDTO dto.SchedulerTriggerReq
 	json.Unmarshal([]byte(value), &scheduleDTO)
 	mail.Send(
 		scheduleDTO.Email,
