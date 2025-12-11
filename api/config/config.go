@@ -46,29 +46,29 @@ type Trigger struct {
 	Expiration int    `mapstructure:"TRIGGER_IN_MEMORY_EXPIRATION_DEFAULT_IN_MS"`
 }
 
-func (l *Trigger) ToInMemoryDB() InMemoryDatabase {
+func (t *Trigger) ToInMemoryDB() InMemoryDatabase {
 	return InMemoryDatabase{
-		Strategy:   l.Strategy,
-		Pass:       l.Pass,
-		Port:       l.Port,
-		Host:       l.Host,
-		DB:         l.DB,
-		Protocol:   l.Protocol,
-		Expiration: l.Expiration,
+		Strategy:   t.Strategy,
+		Pass:       t.Pass,
+		Port:       t.Port,
+		Host:       t.Host,
+		DB:         t.DB,
+		Protocol:   t.Protocol,
+		Expiration: t.Expiration,
 	}
 }
 
-type Cache struct {
-	Strategy   string `mapstructure:"CACHE_IN_MEMORY_STRATEGY"`
-	Pass       string `mapstructure:"CACHE_IN_MEMORY_PASSWORD"`
-	Port       string `mapstructure:"CACHE_IN_MEMORY_PORT"`
-	Host       string `mapstructure:"CACHE_IN_MEMORY_HOST"`
-	DB         int    `mapstructure:"CACHE_IN_MEMORY_DB"`
-	Protocol   int    `mapstructure:"CACHE_IN_MEMORY_PROTOCOL"`
-	Expiration int    `mapstructure:"CACHE_IN_MEMORY_EXPIRATION_DEFAULT_IN_MS"`
+type ShadowKey struct {
+	Strategy   string `mapstructure:"SHADOWKEY_IN_MEMORY_STRATEGY"`
+	Pass       string `mapstructure:"SHADOWKEY_IN_MEMORY_PASSWORD"`
+	Port       string `mapstructure:"SHADOWKEY_IN_MEMORY_PORT"`
+	Host       string `mapstructure:"SHADOWKEY_IN_MEMORY_HOST"`
+	DB         int    `mapstructure:"SHADOWKEY_IN_MEMORY_DB"`
+	Protocol   int    `mapstructure:"SHADOWKEY_IN_MEMORY_PROTOCOL"`
+	Expiration int    `mapstructure:"SHADOWKEY_IN_MEMORY_EXPIRATION_DEFAULT_IN_MS"`
 }
 
-func (c *Cache) ToInMemoryDB() InMemoryDatabase {
+func (c *ShadowKey) ToInMemoryDB() InMemoryDatabase {
 	return InMemoryDatabase{
 		Strategy:   c.Strategy,
 		Pass:       c.Pass,
@@ -94,8 +94,8 @@ type MailNotification struct {
 type Config struct {
 	API              API              `mapstructure:",squash"`
 	PubSub           PubSub           `mapstructure:",squash"`
-	Trigger          Trigger          `mapstructure:",squash"`
-	Cache            Cache            `mapstructure:",squash"`
+	TriggerDB        Trigger          `mapstructure:",squash"`
+	ShadowKeyDB      ShadowKey        `mapstructure:",squash"`
 	MailNotification MailNotification `mapstructure:",squash"`
 }
 

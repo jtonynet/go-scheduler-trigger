@@ -12,7 +12,7 @@
     https://devicon.dev/
     https://simpleicons.org/
 -->
-[<img src="./docs/assets/images/icons/go.svg" width="25px" height="25px" alt="Go Logo" title="Go">](https://go.dev/) [<img src="./docs/assets/images/icons/gin.svg" width="25px" height="25px" alt="Gin Logo" title="Gin">](https://gin-gonic.com/) [<img src="./docs/assets/images/icons/redis.svg" width="25px" height="25px" alt="Redis Logo" title="Redis">](https://redis.io/) [<img src="./docs/assets/images/icons/docker.svg" width="25px" height="25px" alt="Docker Logo" title="Docker">](https://www.docker.com/) [<img src="./docs/assets/images/icons/ubuntu.svg" width="25px" height="25px Logo" title="Ubuntu" alt="Ubuntu" />](https://ubuntu.com/) [<img src="./docs/assets/images/icons/dotenv.svg" width="25px" height="25px" alt="Viper DotEnv Logo" title="Viper DotEnv">](https://github.com/spf13/viper) [<img src="./docs/assets/images/icons/github.svg" width="25px" height="25px" alt="GitHub Logo" title="GitHub">](https://github.com/jtonynet) [<img src="./docs/assets/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="VsCode Logo" title="VsCode">](https://code.visualstudio.com/) [<img src="./docs/assets/images/icons/mermaidjs.svg" width="25px" height="25px" alt="MermaidJS Logo" title="MermaidJS">](https://mermaid.js.org/) [<img src="./docs/assets/images/icons/rabbitmq.svg" width="25px" height="25px" alt="RabbitMQ Logo" title="RabbitMQ">](https://rabbitmq.com/) [<img src="./docs/assets/images/icons/mailhog.png" width="40px" height="30px" alt="MailHog Logo" title="MailHog">](https://github.com/mailhog/MailHog)
+[<img src="./docs/assets/images/icons/go.svg" width="25px" height="25px" alt="Go Logo" title="Go">](https://go.dev/) [<img src="./docs/assets/images/icons/gin.svg" width="25px" height="25px" alt="Gin Logo" title="Gin">](https://gin-gonic.com/) [<img src="./docs/assets/images/icons/redis.svg" width="25px" height="25px" alt="Redis Logo" title="Redis">](https://redis.io/) [<img src="./docs/assets/images/icons/docker.svg" width="25px" height="25px" alt="Docker Logo" title="Docker">](https://www.docker.com/) [<img src="./docs/assets/images/icons/ubuntu.svg" width="25px" height="25px Logo" title="Ubuntu" alt="Ubuntu" />](https://ubuntu.com/) [<img src="./docs/assets/images/icons/dotenv.svg" width="25px" height="25px" alt="Viper DotEnv Logo" title="Viper DotEnv">](https://github.com/spf13/viper) [<img src="./docs/assets/images/icons/github.svg" width="25px" height="25px" alt="GitHub Logo" title="GitHub">](https://github.com/jtonynet) [<img src="./docs/assets/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="VsCode Logo" title="VsCode">](https://code.visualstudio.com/) [<img src="./docs/assets/images/icons/mermaidjs.svg" width="25px" height="25px" alt="MermaidJS Logo" title="MermaidJS">](https://mermaid.js.org/) [<img src="./docs/assets/images/icons/mailhog.png" width="40px" height="30px" alt="MailHog Logo" title="MailHog">](https://github.com/mailhog/MailHog)
 
 <!-- 
 [<img src="./docs/assets/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger Logo" title="Swagger">](https://swagger.io/) [<img src="./docs/assets/images/icons/githubactions.svg" width="25px" height="25px" alt="GithubActions Logo" title="GithubActions">](https://docs.github.com/en/actions) 
@@ -85,6 +85,20 @@ Ao utilizar uma abordagem baseada em eventos, ele garante que cada mensagem seja
 <a id="run-containerized"></a>
 #### 🐋 Containerizado 
 
+Crie uma copia do arquivo `./api/.env.SAMPLE` e renomeie para `./api/.env` e rode os comandos `docker compose` (de acordo com sua versão do docker compose) no diretório `api` do projeto
+
+```bash
+cd api
+docker compose up
+```
+
+<br/>
+
+Aguarde o projeto ser buildado. O `Swagger` deve estar disponível em `http://localhost:8080/swagger/index.html`
+<div align="center">
+<img src="./docs/assets/images/layout/screen-captures/swagger.png">
+</div>
+
 <br/>
 <div align="center">. . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
 <br/>
@@ -93,6 +107,43 @@ Ao utilizar uma abordagem baseada em eventos, ele garante que cada mensagem seja
 <a id="run-use"></a>
 #### ✍️ Endpoints e Uso
 
+Com o projeto rodando, o endpoint `POST` `http://localhost:8080/v1/schedules`  pode ser acionado com um payload válido através do `Swagger` ou seu `http client` de preferência,
+
+```json
+{ 
+    // Email válido
+    "email": "test000@gmail.com",
+    
+    // Mensagem que deve ser enviada por email
+    "message": "Email enviado",
+    
+    // Data e Hora UTC para envio do email (superior a agora)
+    "UTC_trigger_at":"2025-12-05T18:08:00Z"
+}
+```
+
+<br/>
+
+Ou uma request CURL:
+
+```bash
+curl -X 'POST' \
+  'http://localhost:8080/v1/schedules' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "UTC_trigger_at": "2025-12-05T18:08:00Z",
+  "email": "test000@gmail.com",
+  "message": "Email enviado"
+}'
+```
+
+<br/>
+
+Sugiro adequar o primeiro `Gatilho Agendado` para um minuto UTC da hora atual e verificar na rota do `Mailhog` (intercepta envios de email da aplicação e os exibe na sua interface, nenhum email será de fato disparado na configuração padrão do `.env`) em: `http://localhost:8025/`
+<div align="center">
+<img src="./docs/assets/images/layout/screen-captures/mailhog.png">
+</div>
 
 <br/>
 
@@ -184,3 +235,6 @@ Este desafio me permite consolidar conhecimentos e identificar pontos cegos para
 <img src="./docs/assets/images/layout/footer.png" />
 </a>
 </div>
+
+
+<!--  swag init --generalInfo cmd/rest/main.go -o ./docs -->

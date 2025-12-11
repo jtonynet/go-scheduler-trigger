@@ -4,12 +4,12 @@ GET http://localhost:8080/liveness
 Content-Type: application/json
 
 ###
-# @name Store a scheduled message to be sent on the UTC date of "trigger_at"
+# @name Store a scheduled message to be sent on the UTC date of "UTC_trigger_at"
 POST http://localhost:8080/v1/schedules
 Content-Type: application/json
 
 {
-    "email": "test003@gmail.com",
-    "message": "CANCELOU MANEH!",
-    "UTC_trigger_at":"2025-11-25T03:14:00Z"
+    "email": "test000@gmail.com",
+    "message": "Email enviado",
+    "UTC_trigger_at":"2025-12-05T18:08:00Z"
 }

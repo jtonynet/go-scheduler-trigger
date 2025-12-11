@@ -1,0 +1,82 @@
+definitions:
+  dto.LivenessResp:
+    properties:
+      message:
+        example: OK
+        type: string
+      sumary:
+        example: 'go-scheduler-trigger-api:8080 in TagVersion: 0.0.0 on Envoriment:dev
+          responds OK'
+        type: string
+    required:
+    - message
+    - sumary
+    type: object
+  dto.SchedulerTriggerReq:
+    properties:
+      UTC_trigger_at:
+        example: "2025-11-18T15:28:00Z"
+        type: string
+      email:
+        example: test001@gmail.com
+        type: string
+      message:
+        example: Teste de envio temporizado
+        type: string
+    required:
+    - UTC_trigger_at
+    - email
+    - message
+    type: object
+  dto.SchedulerTriggerResp:
+    properties:
+      message:
+        example: Request Accepted
+        type: string
+      uuid:
+        example: 00000000-0000-0000-0000-000000000000
+        type: string
+    required:
+    - message
+    type: object
+info:
+  contact: {}
+paths:
+  /liveness:
+    get:
+      consumes:
+      - application/json
+      description: Check API Health Liveness with some app data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LivenessResp'
+      summary: API Health Liveness
+      tags:
+      - API
+  /v1/schedules:
+    post:
+      consumes:
+      - application/json
+      description: Schedule trigger to send email at a pre-determined UTC date/time.
+      parameters:
+      - description: Request body for Create Scheduler Trigger
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SchedulerTriggerReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SchedulerTriggerResp'
+      summary: Create Scheduler Trigger
+      tags:
+      - Schedules
+swagger: "2.0"

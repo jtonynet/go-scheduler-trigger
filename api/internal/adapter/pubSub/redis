@@ -1,4 +1,4 @@
-package main
+package pubSub
 
 import (
 	"context"
@@ -6,65 +6,60 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/jtonynet/go-scheduler-trigger/api/config"
 	"github.com/jtonynet/go-scheduler-trigger/api/internal/adapter/database"
 	"github.com/jtonynet/go-scheduler-trigger/api/internal/adapter/email"
 	"github.com/jtonynet/go-scheduler-trigger/api/internal/core/dto"
-
 	"github.com/redis/go-redis/v9"
 )
 
-func main() {
-	cfg2, err := config.LoadConfig(".")
-	if err != nil {
-		log.Fatal("cannot load config: ", err)
+type RedisPubSub struct {
+	client *redis.Client
+	pubsub *redis.PubSub
+
+	subscriptions sync.Map
+	strategy      string
+}
+
+func NewRedisPubSub(cfg config.PubSub) (*RedisPubSub, error) {
+	strAddr := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
+
+	client := redis.NewClient(&redis.Options{
+		Addr:     strAddr,
+		Password: cfg.Pass,
+		DB:       cfg.DB,
+		Protocol: cfg.Protocol,
+	})
+
+	rps := &RedisPubSub{
+		client:        client,
+		strategy:      cfg.Strategy,
+		subscriptions: sync.Map{},
 	}
 
-	mail := email.New(cfg2.MailNotification)
+	return rps, nil
+}
 
-	ctx := context.Background()
-
-	cfg := redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", os.Getenv("PUBSUB_HOST"), os.Getenv("PUBSUB_PORT")),
-		Password: os.Getenv("PUBSUB_PASSWORD"),
-		DB:       mustInt(os.Getenv("PUBSUB_DB")),
-		Protocol: mustInt(os.Getenv("PUBSUB_PROTOCOL")),
-	}
-
-	rdb := redis.NewClient(&cfg)
-
-	// Teste de conexão
-	if err := rdb.Ping(ctx).Err(); err != nil {
-		log.Fatalf("Não conectou ao Redis: %v", err)
-	}
-
-	log.Printf("Conectado ao Redis -> %s:%s (DB: %s)",
-		os.Getenv("PUBSUB_HOST"),
-		os.Getenv("PUBSUB_PORT"),
-		os.Getenv("PUBSUB_DB"),
-	)
-
-	shadowKeyInMemoDB, err := database.NewInMemory(cfg2.ShadowKeyDB.ToInMemoryDB())
-	if err != nil {
-		log.Fatal("cannot connect in cacheInMemoDB: ", err)
-	}
-
+func (r *RedisPubSub) Subscribe(ctx context.Context) {
 	// Canal de expiração
 	channel := fmt.Sprintf("__keyevent@%s__:expired", os.Getenv("PUBSUB_DB"))
 	log.Printf("Escutando expirações no canal: %s", channel)
 
 	// Loop resiliente
 	for {
-		if err := listenTriggers(ctx, rdb, shadowKeyInMemoDB, channel, mail); err != nil {
+		if err := listenTriggers(ctx, rdb, cacheInMemoDB, channel, mailAdapter); err != nil {
 			log.Printf("Erro no listener, reconectando em 2s... err=%v", err)
 			time.Sleep(2 * time.Second)
 		}
 	}
+
+	// return nil
 }
 
-func listenTriggers(ctx context.Context, rdb *redis.Client, shadowKeyInMemoDB database.InMemory, channel string, mail *email.Mail) error {
+func listenTriggers(ctx context.Context, rdb *redis.Client, cacheInMemoDB database.InMemory, channel string, mail *email.Mail) error {
 	pubsub := rdb.Subscribe(ctx, channel)
 
 	_, err := pubsub.Receive(ctx)
@@ -81,7 +76,7 @@ func listenTriggers(ctx context.Context, rdb *redis.Client, shadowKeyInMemoDB da
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// Tentar recuperar o valor original
-		value, err := shadowKeyInMemoDB.Get(ctx, key)
+		value, err := cacheInMemoDB.Get(ctx, key)
 		if err == redis.Nil {
 			log.Printf("Shadow key não encontrada: %s (já removida?)", key)
 			continue
@@ -97,7 +92,7 @@ func listenTriggers(ctx context.Context, rdb *redis.Client, shadowKeyInMemoDB da
 		// ------------------------------------------------------
 
 		// Remover shadow key após processar
-		if err := shadowKeyInMemoDB.Delete(ctx, key); err != nil {
+		if err := cacheInMemoDB.Delete(ctx, key); err != nil {
 			log.Printf("Erro ao remover shadow key %s: %v", key, err)
 		} else {
 			log.Printf("Shadow key removida: %s", key)
@@ -126,4 +121,44 @@ func mustInt(v string) int {
 	var x int
 	fmt.Sscan(v, &x)
 	return x
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+
+func (r *RedisPubSub) UnSubscribe(_ context.Context, key Key) error {
+	if transactionsSubscriptions, ok := r.subscriptions.Load(key.Account); ok {
+		transactionMap, _ := transactionsSubscriptions.(*sync.Map)
+
+		if subscription, exists := transactionMap.Load(key.Transaction); exists {
+			transactionMap.Delete(key.Transaction)
+			close(subscription.(chan string))
+
+			hasRemaining := false
+			transactionMap.Range(func(_, _ interface{}) bool {
+				hasRemaining = true
+				return false
+			})
+
+			if !hasRemaining {
+				r.subscriptions.Delete(key.Account)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *RedisPubSub) Publish(ctx context.Context, topic, message string) error {
+	return r.client.Publish(ctx, topic, message).Err()
+}
+
+func (r *RedisPubSub) Close() error {
+	if r.pubsub != nil {
+		return r.pubsub.Close()
+	}
+	return nil
+}
+
+func (r *RedisPubSub) GetStrategy(_ context.Context) (string, error) {
+	return r.strategy, nil
 }
