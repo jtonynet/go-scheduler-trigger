@@ -5,68 +5,56 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/jtonynet/go-scheduler-trigger/api/internal/adapter/database"
+	"github.com/jtonynet/go-scheduler-trigger/api/internal/adapter/repository"
 	"github.com/jtonynet/go-scheduler-trigger/api/internal/core/dto"
 )
 
 type SchedulerTriggerCreate struct {
-	// TODO: using `database adapter` instead of a `repository adapter` to simplify the example.
-	cacheInMemoDB   database.InMemory
-	triggerInMemoDB database.InMemory
-
-	// shadowKeyRepo repository.SchedulerTriggerRedis
-	// triggerRepo   repository.SchedulerTriggerRedis
+	shadowKeyRepo repository.SchedulerTrigger
+	triggerRepo   repository.SchedulerTrigger
 }
 
 func NewSchedulerTriggerCreate(
-	cacheInMemoDB database.InMemory,
-	triggerInMemoDB database.InMemory,
+	shadowKeyRepo repository.SchedulerTrigger,
+	triggerRepo repository.SchedulerTrigger,
 ) *SchedulerTriggerCreate {
 	return &SchedulerTriggerCreate{
-		cacheInMemoDB,
-		triggerInMemoDB,
+		shadowKeyRepo,
+		triggerRepo,
 	}
 }
 
 func (stc *SchedulerTriggerCreate) Execute(scheduleReq dto.SchedulerTriggerReq) (*string, error) {
-	scheduleReq.UID = uuid.New()
-
-	// TODO: use `repository` and `domain` to make it `Tell dont ask` in future
-
 	ctxReq := context.Background()
+
+	scheduleReq.UID = uuid.New()
 	key := fmt.Sprintf("schedule:%s", scheduleReq.UID.String())
 
-	// CACHED MESSAGE DATA
-	expiration, err := stc.cacheInMemoDB.GetDefaultExpiration(ctxReq)
-	if err != nil {
-		return nil, fmt.Errorf("failed on cache GetDefaultExpiration: %w", err)
-	}
-
-	err = stc.cacheInMemoDB.Set(
-		ctxReq,
-		key,
-		scheduleReq,
-		expiration,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to persists cacheInMemoDB data: %w", err)
-	}
-
-	// ONLY KEY TO TRIGGER SEND MESSAGE
+	// TRIGGER TO SEND MESSAGE
 	triggerAt, err := mapUTCDataToTimeDuration(scheduleReq.TriggerAt)
 	if err != nil {
-		return nil, fmt.Errorf("failed to MapUTCDataToTimeDuration: %w", err)
+		return nil, fmt.Errorf("failed to Map UTC data to TimeDuration: %w", err)
 	}
 
-	err = stc.triggerInMemoDB.Set(
+	err = stc.triggerRepo.Create(
 		ctxReq,
 		key,
 		nil,
-		*triggerAt,
+		triggerAt,
 	)
-
 	if err != nil {
-		return nil, fmt.Errorf("failed to persists triggerInMemoDB data: %w", err)
+		return nil, fmt.Errorf("failed to persists Trigger data: %w", err)
+	}
+
+	// SHADOW KEY - DATA MESSAGE
+	err = stc.shadowKeyRepo.Create(
+		ctxReq,
+		key,
+		&scheduleReq,
+		nil,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to persists Shadow Key data: %w", err)
 	}
 
 	uid := scheduleReq.UID.String()

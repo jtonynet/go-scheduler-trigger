@@ -56,7 +56,7 @@ func (c *RedisClient) GetStrategy(_ context.Context) (string, error) {
 	return c.strategy, nil
 }
 
-func (c *RedisClient) Set(_ context.Context, key string, value interface{}, expiration time.Duration) error {
+func (c *RedisClient) Set(_ context.Context, key string, value any, expiration time.Duration) error {
 	data, err := json.Marshal(value)
 	if err != nil {
 		return err
@@ -103,6 +103,6 @@ func (c *RedisClient) GetDefaultExpiration(_ context.Context) (time.Duration, er
 	return c.expiration, nil
 }
 
-func (c *RedisClient) GetClient(_ context.Context) (interface{}, error) {
+func (c *RedisClient) GetClient(_ context.Context) (any, error) {
 	return c.client, nil
 }

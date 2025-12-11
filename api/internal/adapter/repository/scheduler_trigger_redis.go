@@ -13,7 +13,7 @@ type SchedulerTriggerRedis struct {
 	db database.InMemory
 }
 
-func NewSchedulerTriggerRedis(db database.InMemory) *SchedulerTriggerRedis {
+func NewSchedulerTriggerRedis(db database.InMemory) SchedulerTrigger {
 	return &SchedulerTriggerRedis{
 		db,
 	}

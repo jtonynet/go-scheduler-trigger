@@ -46,7 +46,7 @@ func main() {
 		os.Getenv("PUBSUB_DB"),
 	)
 
-	cacheInMemoDB, err := database.NewInMemory(cfg2.Cache.ToInMemoryDB())
+	shadowKeyInMemoDB, err := database.NewInMemory(cfg2.ShadowKeyDB.ToInMemoryDB())
 	if err != nil {
 		log.Fatal("cannot connect in cacheInMemoDB: ", err)
 	}
@@ -57,14 +57,14 @@ func main() {
 
 	// Loop resiliente
 	for {
-		if err := listenTriggers(ctx, rdb, cacheInMemoDB, channel, mail); err != nil {
+		if err := listenTriggers(ctx, rdb, shadowKeyInMemoDB, channel, mail); err != nil {
 			log.Printf("Erro no listener, reconectando em 2s... err=%v", err)
 			time.Sleep(2 * time.Second)
 		}
 	}
 }
 
-func listenTriggers(ctx context.Context, rdb *redis.Client, cacheInMemoDB database.InMemory, channel string, mail *email.Mail) error {
+func listenTriggers(ctx context.Context, rdb *redis.Client, shadowKeyInMemoDB database.InMemory, channel string, mail *email.Mail) error {
 	pubsub := rdb.Subscribe(ctx, channel)
 
 	_, err := pubsub.Receive(ctx)
@@ -81,7 +81,7 @@ func listenTriggers(ctx context.Context, rdb *redis.Client, cacheInMemoDB databa
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// Tentar recuperar o valor original
-		value, err := cacheInMemoDB.Get(ctx, key)
+		value, err := shadowKeyInMemoDB.Get(ctx, key)
 		if err == redis.Nil {
 			log.Printf("Shadow key não encontrada: %s (já removida?)", key)
 			continue
@@ -97,7 +97,7 @@ func listenTriggers(ctx context.Context, rdb *redis.Client, cacheInMemoDB databa
 		// ------------------------------------------------------
 
 		// Remover shadow key após processar
-		if err := cacheInMemoDB.Delete(ctx, key); err != nil {
+		if err := shadowKeyInMemoDB.Delete(ctx, key); err != nil {
 			log.Printf("Erro ao remover shadow key %s: %v", key, err)
 		} else {
 			log.Printf("Shadow key removida: %s", key)

@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor REST APP with Clean Architecture approach
 - Adding Swagger to REST API
 - Improvements to the README file
+- Adding Repository
 
 ## [0.0.2] - 2025-03-12
 ### Added

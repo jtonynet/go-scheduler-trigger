@@ -19,8 +19,5 @@ func mapUTCDataToTimeDuration(UTCData string) (*time.Duration, error) {
 		return nil, errors.New("UTC data bellow actual time")
 	}
 
-	// fmt.Println("TTL duration:", duration)
-	// fmt.Println("TTL seconds:", int64(duration.Seconds()))
-
 	return &duration, nil
 }
