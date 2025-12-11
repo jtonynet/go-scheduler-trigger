@@ -21,7 +21,7 @@ func NewREST(cfg *config.Config) (*REST, error) {
 
 	triggerDB, err := database.NewInMemory(cfg.TriggerDB.ToInMemoryDB())
 	if err != nil {
-		return nil, fmt.Errorf("failed to initialize triggerInMemoDB: %w", err)
+		return nil, fmt.Errorf("failed to initialize triggerDB: %w", err)
 	}
 
 	shadowKeyRepo := repository.NewSchedulerTriggerRedis(shadowKeyDB)
