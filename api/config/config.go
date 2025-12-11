@@ -46,15 +46,15 @@ type Trigger struct {
 	Expiration int    `mapstructure:"TRIGGER_IN_MEMORY_EXPIRATION_DEFAULT_IN_MS"`
 }
 
-func (l *Trigger) ToInMemoryDB() InMemoryDatabase {
+func (t *Trigger) ToInMemoryDB() InMemoryDatabase {
 	return InMemoryDatabase{
-		Strategy:   l.Strategy,
-		Pass:       l.Pass,
-		Port:       l.Port,
-		Host:       l.Host,
-		DB:         l.DB,
-		Protocol:   l.Protocol,
-		Expiration: l.Expiration,
+		Strategy:   t.Strategy,
+		Pass:       t.Pass,
+		Port:       t.Port,
+		Host:       t.Host,
+		DB:         t.DB,
+		Protocol:   t.Protocol,
+		Expiration: t.Expiration,
 	}
 }
 

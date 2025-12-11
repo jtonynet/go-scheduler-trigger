@@ -13,6 +13,9 @@ type SchedulerTriggerCreate struct {
 	// TODO: using `database adapter` instead of a `repository adapter` to simplify the example.
 	cacheInMemoDB   database.InMemory
 	triggerInMemoDB database.InMemory
+
+	// shadowKeyRepo repository.SchedulerTriggerRedis
+	// triggerRepo   repository.SchedulerTriggerRedis
 }
 
 func NewSchedulerTriggerCreate(
@@ -27,6 +30,8 @@ func NewSchedulerTriggerCreate(
 
 func (stc *SchedulerTriggerCreate) Execute(scheduleReq dto.SchedulerTriggerReq) (*string, error) {
 	scheduleReq.UID = uuid.New()
+
+	// TODO: use `repository` and `domain` to make it `Tell dont ask` in future
 
 	ctxReq := context.Background()
 	key := fmt.Sprintf("schedule:%s", scheduleReq.UID.String())
@@ -48,9 +53,9 @@ func (stc *SchedulerTriggerCreate) Execute(scheduleReq dto.SchedulerTriggerReq) 
 	}
 
 	// ONLY KEY TO TRIGGER SEND MESSAGE
-	triggerAt, err := MapUTCDataToTimeDuration(scheduleReq.TriggerAt)
+	triggerAt, err := mapUTCDataToTimeDuration(scheduleReq.TriggerAt)
 	if err != nil {
-		return nil, fmt.Errorf("failed to persists MapUTCDataToTimeDuration: %w", err)
+		return nil, fmt.Errorf("failed to MapUTCDataToTimeDuration: %w", err)
 	}
 
 	err = stc.triggerInMemoDB.Set(

@@ -38,12 +38,11 @@ func (gr Gin) HandleRequests(_ context.Context) error {
 
 	r := gin.Default()
 	r.Use(ginMiddleware.ConfigInject(gr.cfg))
-	r.Use(ginMiddleware.AppInject(gr.app))
-
 	r.GET("liveness", ginHandler.Liveness)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	v1 := r.Group("/v1")
+	v1.Use(ginMiddleware.AppInject(gr.app))
 	v1.POST("schedules", ginHandler.SchedulerTriggerCreate)
 
 	port := fmt.Sprintf(":%s", gr.cfg.Port)

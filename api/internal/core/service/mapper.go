@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func MapUTCDataToTimeDuration(UTCData string) (*time.Duration, error) {
+func mapUTCDataToTimeDuration(UTCData string) (*time.Duration, error) {
 	targetTime, err := time.Parse(time.RFC3339, UTCData)
 	if err != nil {
 		return nil, fmt.Errorf("UTC parser error: %w", err)
@@ -19,8 +19,8 @@ func MapUTCDataToTimeDuration(UTCData string) (*time.Duration, error) {
 		return nil, errors.New("UTC data bellow actual time")
 	}
 
-	fmt.Println("TTL duration:", duration)
-	fmt.Println("TTL seconds:", int64(duration.Seconds()))
+	// fmt.Println("TTL duration:", duration)
+	// fmt.Println("TTL seconds:", int64(duration.Seconds()))
 
 	return &duration, nil
 }

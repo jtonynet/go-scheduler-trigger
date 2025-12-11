@@ -94,7 +94,7 @@ docker compose up
 
 <br/>
 
-Aguarde o projeto ser buildado. O `Swagger` deve estar disponivel em `http://localhost:8080/swagger/index.html`
+Aguarde o projeto ser buildado. O `Swagger` deve estar disponível em `http://localhost:8080/swagger/index.html`
 <div align="center">
 <img src="./docs/assets/images/layout/screen-captures/swagger.png">
 </div>
