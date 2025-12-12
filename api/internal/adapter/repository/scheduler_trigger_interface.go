@@ -9,4 +9,6 @@ import (
 
 type SchedulerTrigger interface {
 	Create(ctx context.Context, key string, scheduleReq *dto.SchedulerTriggerReq, expiration *time.Duration) error
+	Retrieve(ctx context.Context, key string) (*dto.SchedulerTriggerReq, error)
+	Delete(ctx context.Context, key string) error
 }
