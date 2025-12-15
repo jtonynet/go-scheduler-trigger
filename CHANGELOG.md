@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+## [0.0.4] - 2025-14-12
+### Added
+
+- Refactor WORKER APP with Clean Architecture approach
+
 ## [0.0.3] - 2025-05-12
 ### Added
 
