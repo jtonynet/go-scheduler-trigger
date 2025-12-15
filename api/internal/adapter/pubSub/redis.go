@@ -36,11 +36,15 @@ func NewRedisPubSub(cfg config.PubSub) (*RedisPubSub, error) {
 
 func (r *RedisPubSub) Subscribe(ctx context.Context) (<-chan string, error) {
 	channel := fmt.Sprintf("__keyevent@%v__:expired", r.db)
+
+	if r.pubsub != nil {
+		_ = r.pubsub.Close()
+	}
+
 	r.pubsub = r.client.Subscribe(ctx, channel)
 
-	_, err := r.pubsub.Receive(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("subscription channel error: %w", err)
+	if _, err := r.pubsub.Receive(ctx); err != nil {
+		return nil, fmt.Errorf("subscription error: %w", err)
 	}
 
 	out := make(chan string)

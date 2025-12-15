@@ -45,8 +45,5 @@ func (gr Gin) HandleRequests(_ context.Context) error {
 	v1.Use(ginMiddleware.AppInject(gr.app))
 	v1.POST("schedules", ginHandler.SchedulerTriggerCreate)
 
-	port := fmt.Sprintf(":%s", gr.cfg.Port)
-	r.Run(port)
-
-	return nil
+	return r.Run(fmt.Sprintf(":%s", gr.cfg.Port))
 }
