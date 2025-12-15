@@ -24,9 +24,7 @@ func NewSchedulerTriggerCreate(
 	}
 }
 
-func (stc *SchedulerTriggerCreate) Execute(scheduleReq dto.SchedulerTriggerReq) (*string, error) {
-	ctxReq := context.Background()
-
+func (stc *SchedulerTriggerCreate) Execute(ctx context.Context, scheduleReq dto.SchedulerTriggerReq) (*string, error) {
 	scheduleReq.UID = uuid.New()
 	key := fmt.Sprintf("schedule:%s", scheduleReq.UID.String())
 
@@ -36,24 +34,22 @@ func (stc *SchedulerTriggerCreate) Execute(scheduleReq dto.SchedulerTriggerReq) 
 		return nil, fmt.Errorf("failed to Map UTC data to TimeDuration: %w", err)
 	}
 
-	err = stc.triggerRepo.Create(
-		ctxReq,
+	if err := stc.triggerRepo.Create(
+		ctx,
 		key,
 		nil,
 		triggerAt,
-	)
-	if err != nil {
+	); err != nil {
 		return nil, fmt.Errorf("failed to persists Trigger data: %w", err)
 	}
 
 	// SHADOW KEY - DATA MESSAGE
-	err = stc.shadowKeyRepo.Create(
-		ctxReq,
+	if err = stc.shadowKeyRepo.Create(
+		ctx,
 		key,
 		&scheduleReq,
 		nil,
-	)
-	if err != nil {
+	); err != nil {
 		return nil, fmt.Errorf("failed to persists Shadow Key data: %w", err)
 	}
 

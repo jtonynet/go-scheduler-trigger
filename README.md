@@ -22,7 +22,7 @@
 
  <!--[![Badge GitHubActions](https://github.com/jtonynet/go-pique-nique/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/jtonynet/go-pique-nique/actions) --> 
 
-[![Go Version](https://img.shields.io/badge/GO-1.23.2-blue?logo=go&logoColor=white)](https://go.dev/)
+[![Badge Status](https://img.shields.io/badge/STATUS-EM_ANDAMENTO-green)](#header) [![Go Version](https://img.shields.io/badge/GO-1.23.2-blue?logo=go&logoColor=white)](https://go.dev/)
 
 ## 🕸️ Redes
 

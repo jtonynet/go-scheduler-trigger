@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -31,14 +32,35 @@ func (str *SchedulerTriggerRedis) Create(ctx context.Context, key string, schedu
 		expiration = &exp
 	}
 
-	err = str.db.Set(
+	if err = str.db.Set(
 		ctx,
 		key,
 		scheduleReq,
 		*expiration,
-	)
-	if err != nil {
+	); err != nil {
 		return fmt.Errorf("failed to create SchedulerTriggerRedis: %w", err)
+	}
+
+	return nil
+}
+
+func (str *SchedulerTriggerRedis) Retrieve(ctx context.Context, key string) (*dto.SchedulerTriggerReq, error) {
+	st, err := str.db.Get(ctx, key)
+	if err != nil {
+		return nil, err
+	}
+
+	var req dto.SchedulerTriggerReq
+	if err := json.Unmarshal([]byte(st), &req); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal scheduler trigger: %w", err)
+	}
+
+	return &req, nil
+}
+
+func (str *SchedulerTriggerRedis) Delete(ctx context.Context, key string) error {
+	if err := str.db.Delete(ctx, key); err != nil {
+		return err
 	}
 
 	return nil
