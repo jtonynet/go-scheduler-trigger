@@ -61,7 +61,6 @@ func (c *RedisClient) Set(_ context.Context, key string, value any, expiration t
 	if err != nil {
 		return err
 	}
-	fmt.Println(data)
 
 	err = c.client.Set(c.ctx, key, data, expiration).Err()
 	if err != nil {

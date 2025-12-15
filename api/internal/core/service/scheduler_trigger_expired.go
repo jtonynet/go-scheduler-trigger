@@ -2,47 +2,39 @@ package service
 
 import (
 	"context"
-	"log"
 
 	"github.com/jtonynet/go-scheduler-trigger/api/internal/adapter/email"
-	"github.com/jtonynet/go-scheduler-trigger/api/internal/adapter/pubSub"
 	"github.com/jtonynet/go-scheduler-trigger/api/internal/adapter/repository"
 )
 
 type SchedulerTriggerExpired struct {
 	mail          email.Mail
-	triggerPubSub pubSub.PubSub
 	shadowKeyRepo repository.SchedulerTrigger
 }
 
 func NewSchedulerTriggerExpired(
 	mail email.Mail,
-	triggerPubSub pubSub.PubSub,
 	shadowKeyRepo repository.SchedulerTrigger,
 ) *SchedulerTriggerExpired {
 	return &SchedulerTriggerExpired{
-		mail,
-		triggerPubSub,
-		shadowKeyRepo,
+		mail:          mail,
+		shadowKeyRepo: shadowKeyRepo,
 	}
 }
 
-func (ste *SchedulerTriggerExpired) Execute() {
-	ctx := context.Background()
-
-	triggerExpiredChannel, err := ste.triggerPubSub.Subscribe(ctx)
+func (ste *SchedulerTriggerExpired) Process(ctx context.Context, key string) error {
+	scheduleDTO, err := ste.shadowKeyRepo.Retrieve(ctx, key)
 	if err != nil {
-		log.Fatal("cannot subscribe Trigger channel: ", err)
+		return err
 	}
 
-	for key := range triggerExpiredChannel {
-		scheduleDTO, _ := ste.shadowKeyRepo.Retrieve(ctx, key)
-		ste.mail.Send(
-			scheduleDTO.Email,
-			"TESTE",
-			scheduleDTO.Message,
-		)
-
-		ste.shadowKeyRepo.Delete(ctx, key)
+	if err := ste.mail.Send(
+		scheduleDTO.Email,
+		"TESTE",
+		scheduleDTO.Message,
+	); err != nil {
+		return err
 	}
+
+	return ste.shadowKeyRepo.Delete(ctx, key)
 }

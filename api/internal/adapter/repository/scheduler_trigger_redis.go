@@ -32,13 +32,12 @@ func (str *SchedulerTriggerRedis) Create(ctx context.Context, key string, schedu
 		expiration = &exp
 	}
 
-	err = str.db.Set(
+	if err = str.db.Set(
 		ctx,
 		key,
 		scheduleReq,
 		*expiration,
-	)
-	if err != nil {
+	); err != nil {
 		return fmt.Errorf("failed to create SchedulerTriggerRedis: %w", err)
 	}
 
@@ -51,8 +50,6 @@ func (str *SchedulerTriggerRedis) Retrieve(ctx context.Context, key string) (*dt
 		return nil, err
 	}
 
-	fmt.Println(st)
-
 	var req dto.SchedulerTriggerReq
 	if err := json.Unmarshal([]byte(st), &req); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal scheduler trigger: %w", err)
@@ -62,8 +59,7 @@ func (str *SchedulerTriggerRedis) Retrieve(ctx context.Context, key string) (*dt
 }
 
 func (str *SchedulerTriggerRedis) Delete(ctx context.Context, key string) error {
-	err := str.db.Delete(ctx, key)
-	if err != nil {
+	if err := str.db.Delete(ctx, key); err != nil {
 		return err
 	}
 

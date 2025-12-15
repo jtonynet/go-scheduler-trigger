@@ -17,12 +17,12 @@ func main() {
 		log.Fatal("cannot load config: ", err)
 	}
 
-	app, err := bootstrap.NewREST(cfg)
+	appREST, err := bootstrap.NewREST(cfg)
 	if err != nil {
 		log.Fatal("cannot initiate app: ", err)
 	}
 
-	routes, err := router.NewGin(cfg.API, *app)
+	routes, err := router.NewGin(cfg.API, *appREST)
 	if err != nil {
 		log.Fatal("cannot initiate routes: ", err)
 	}

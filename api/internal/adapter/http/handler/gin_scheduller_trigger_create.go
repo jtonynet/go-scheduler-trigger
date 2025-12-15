@@ -1,6 +1,7 @@
 package ginHandler
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -29,7 +30,7 @@ func SchedulerTriggerCreate(ctx *gin.Context) {
 		return
 	}
 
-	uid, err := app.SchedulerTriggerCreate.Execute(scheduleReq)
+	uid, err := app.SchedulerTriggerCreate.Execute(context.Background(), scheduleReq)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, &dto.SchedulerTriggerResp{
 			Message: err.Error(),

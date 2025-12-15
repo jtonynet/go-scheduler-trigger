@@ -16,9 +16,8 @@ type REST struct {
 }
 
 type Worker struct {
-	Email         email.Mail
-	TriggerPubSub pubSub.PubSub
-	ShadowKeyRepo repository.SchedulerTrigger
+	TriggerPubSub           pubSub.PubSub
+	SchedulerTriggerExpired *service.SchedulerTriggerExpired
 }
 
 func NewREST(cfg *config.Config) (*REST, error) {
@@ -59,9 +58,13 @@ func NewWorker(cfg *config.Config) (*Worker, error) {
 	}
 	shadowKeyRepo := repository.NewSchedulerTriggerRedis(shadowKeyDB)
 
+	schedulerTriggerExpired := service.NewSchedulerTriggerExpired(
+		*mail,
+		shadowKeyRepo,
+	)
+
 	return &Worker{
-		Email:         *mail,
-		ShadowKeyRepo: shadowKeyRepo,
-		TriggerPubSub: triggerPubSub,
+		TriggerPubSub:           triggerPubSub,
+		SchedulerTriggerExpired: schedulerTriggerExpired,
 	}, nil
 }

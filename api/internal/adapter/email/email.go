@@ -60,6 +60,5 @@ func (es *Mail) Send(to string, subject string, body string) error {
 		return err
 	}
 
-	log.Println("email sent successfully")
 	return nil
 }
