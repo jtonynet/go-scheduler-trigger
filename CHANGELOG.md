@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+## [0.0.6] - 2025-16-12
+### Added
+
+- Adding Mermaid diagram into README
+
 ## [0.0.5] - 2025-16-12
 ### Added
 
@@ -45,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First commit to start the project/study.
 
+[0.0.6]: https://github.com/jtonynet/go-scheduler-trigger/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/jtonynet/go-scheduler-trigger/compare/v0.0.4...v0.0.5
 [0.0.4]: https://github.com/jtonynet/go-scheduler-trigger/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/jtonynet/go-scheduler-trigger/compare/v0.0.2...v0.0.3
