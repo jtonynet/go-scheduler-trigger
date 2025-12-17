@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/jtonynet/go-scheduler-trigger/api/config"
-	redis "github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9"
 )
 
 /*
@@ -26,13 +26,21 @@ type RedisClient struct {
 func NewRedisClient(cfg config.InMemoryDatabase) (*RedisClient, error) {
 	strAddr := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
 	client := redis.NewClient(&redis.Options{
-		Addr:     strAddr,
-		Password: cfg.Pass,
-		DB:       cfg.DB,
-		Protocol: cfg.Protocol,
+		Addr:            strAddr,
+		Password:        cfg.Pass,
+		DB:              cfg.DB,
+		Protocol:        cfg.Protocol,
+		MaxRetries:      cfg.MaxRetries,
+		MinRetryBackoff: cfg.MinRetryBackoff,
+		MaxRetryBackoff: cfg.MaxRetryBackoff,
+		DialTimeout:     cfg.DialTimeout,
+		ReadTimeout:     cfg.ReadTimeout,
+		WriteTimeout:    cfg.WriteTimeout,
+		PoolSize:        cfg.PoolSize,
+		MinIdleConns:    cfg.MinIdleConns,
 	})
 
-	Expiration := time.Duration(cfg.Expiration * int(time.Millisecond))
+	Expiration := cfg.Expiration
 
 	return &RedisClient{
 		ctx: context.Background(),

@@ -39,20 +39,24 @@ func (r *RedisPubSub) Subscribe(ctx context.Context) (<-chan string, error) {
 
 	if r.pubsub != nil {
 		_ = r.pubsub.Close()
+		r.pubsub = nil
 	}
 
-	r.pubsub = r.client.Subscribe(ctx, channel)
+	pubsub := r.client.Subscribe(ctx, channel)
 
-	if _, err := r.pubsub.Receive(ctx); err != nil {
-		return nil, fmt.Errorf("subscription error: %w", err)
+	if _, err := pubsub.Receive(ctx); err != nil {
+		_ = pubsub.Close()
+		return nil, fmt.Errorf("redis subscribe failed: %w", err)
 	}
+
+	r.pubsub = pubsub
 
 	out := make(chan string)
 
 	go func() {
 		defer close(out)
+		ch := pubsub.Channel()
 
-		ch := r.pubsub.Channel()
 		for {
 			select {
 			case <-ctx.Done():
