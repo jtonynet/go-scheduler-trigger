@@ -45,7 +45,7 @@ __[Go Scheduler Trigger](#header)__<br/>
       - ✍️ [Endpoints e Uso](#run-use)
   4.  🔢 [Versões](#versions)
   5.  📊 [Diagramas](#diagrams)
-      - 📈 [ER](#diagrams-erchart)
+      - 📈 [Arquitetura do Sistema](#diagrams-system-architecture)
   6.  🤖 [Uso de IA](#ia)
   7.  🏁 [Conclusão](#conclusion)
 
@@ -85,10 +85,9 @@ Ao utilizar uma abordagem baseada em eventos, ele garante que cada mensagem seja
 <a id="run-containerized"></a>
 #### 🐋 Containerizado 
 
-Crie uma copia do arquivo `./api/.env.SAMPLE` e renomeie para `./api/.env` e rode os comandos `docker compose` (de acordo com sua versão do docker compose) no diretório `api` do projeto
+Crie uma copia do arquivo `./api/.env.SAMPLE` e renomeie para `./api/.env` e rode os comandos `docker compose` (de acordo com sua versão do docker compose)
 
 ```bash
-cd api
 docker compose up
 ```
 
@@ -154,10 +153,52 @@ Sugiro adequar o primeiro `Gatilho Agendado` para um minuto UTC da hora atual e 
 <a id="diagrams"></a>
 ### 📊 Diagramas
 
-<a id="diagrams-erchart"></a>
-#### 📈 ER
+<a id="diagrams-system-architecture"></a>
+#### 📈 Arquitetura do Sistema
 
-**TODO**
+
+```mermaid
+graph LR
+    subgraph API
+        Worker[Worker]
+        REST[REST] 
+    end
+
+    subgraph Services
+        SchedulerTriggerCreate[SchedulerTriggerCreate Service]
+        SchedulerTriggerExpired[SchedulerTriggerExpired Service]
+    end
+
+    subgraph Repositories
+        ShadowKeyRepo[ShadowKeyRepo - Redis]
+        TriggerRepo[TriggerRepo - Redis]
+    end
+
+    subgraph Database inMemory
+        TriggerDB[(TriggerDB - Redis)]
+        ShadowKeyDB[(ShadowKeyDB - Redis)]
+    end
+
+    subgraph Infrastructure
+        PubSub([Redis PubSub - Trigger Expired])
+        Email[Email Adapter]
+    end
+
+    %% REST flow
+    REST --> SchedulerTriggerCreate
+    SchedulerTriggerCreate -- cria --> ShadowKeyRepo
+    SchedulerTriggerCreate -- cria --> TriggerRepo
+    ShadowKeyRepo --> ShadowKeyDB
+    TriggerRepo --> TriggerDB
+
+    %% Worker flow
+    Worker -- sobrescreve --> PubSub
+    TriggerDB -- publica --> PubSub
+    Worker --> SchedulerTriggerExpired
+    SchedulerTriggerExpired -- deleta --> ShadowKeyRepo
+    SchedulerTriggerExpired -- envia --> Email
+
+```
 
 <div align="center">
 
